@@ -4,3 +4,4 @@ __pycache__/
 vault.enc
 master.hash
 salt.bin
+tests/

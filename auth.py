@@ -5,6 +5,7 @@ def hash_master_password(password: str) -> bytes:
     password_bytes = password.encode("utf-8")
     return bcrypt.hashpw(password_bytes, bcrypt.gensalt())
 
+
 def verify_master_password(password: str, hashed: bytes) -> bool:
     """Verifie que le password maître et le hash corresponde. Retourne un bool"""
     password_bytes = password.encode("utf-8")
