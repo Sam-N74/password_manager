@@ -14,7 +14,7 @@ HASH_PATH = "master.hash"
 def init_vault() -> None:
     """Initialise le CLI en créant et stockant le salt et le Master Password (uniquement si le vault n'existe pas deja)"""
     if os.path.exists(HASH_PATH):
-        print("Attention le CLI a deja été initialisé !\n")
+        print("Attention le CLI a deja été initialisé !")
         return None
     password = getpass.getpass("Master Password: ")
 
@@ -36,11 +36,11 @@ def verify_vault() -> bytes | None:
 
     for i in range (3):
         password = getpass.getpass("Master Password: ")
-        print("\n")
+
         if (not auth.verify_master_password(password, hashed)):
             print(f"Master Password incorrect, {2 - i} tentative(s) restante(s).")
         else:
-            print("Master Password correct \n")
+            print("Master Password correct")
             return crypto.derive_key(password, salt)
     return None
 
@@ -49,13 +49,13 @@ def cmd_add(site: str, login: str, password: str) -> None:
     """Commande add de vault.py"""
     key = verify_vault()
     if key is None:
-        print("Clé incorrect.\n")
+        print("Clé incorrect.")
         return
     
     if vault.add_vault(VAULT_PATH, site, login, password, key):
-        print("Enregistrement effectué.\n")
+        print("Enregistrement effectué.")
     else:
-        print("Erreur, site deja présent.\n")
+        print("Erreur, site deja présent.")
     return
 
 
@@ -63,13 +63,13 @@ def cmd_get(site: str) -> None:
     """Commande get de vault.py"""
     key = verify_vault()
     if key is None:
-        print("Clé incorrect.\n")
+        print("Clé incorrect.")
         return
     
     entry = vault.get_vault(VAULT_PATH, site, key)
 
     if entry is None:
-        print("Le site n'est pas enregistré.\n")
+        print("Le site n'est pas enregistré.")
         adding = None
 
         while (adding != "o" and adding != "n"):
@@ -79,42 +79,45 @@ def cmd_get(site: str) -> None:
                 login = input("Login: ")
                 password = input("Password: ")
                 if vault.add_vault(VAULT_PATH, site, login, password, key):
-                    print("Enregistrement effectué.\n")
+                    print("Enregistrement effectué.")
                 else:
-                    print("Erreur, site deja présent.\n")
+                    print("Erreur, site deja présent.")
                     return
                 return
             
             elif (adding == "n"):
                 return
             
-    print(f"Login: {entry['login']}\nPassword: {entry['password']}\n")
+    print(f"Login: {entry['login']}\nPassword: {entry['password']}")
     
 
 def cmd_list() -> None:
     """Commande list de vault.py"""
     key = verify_vault()
     if key is None:
-        print("Clé incorrect.\n")
+        print("Clé incorrect.")
         return
     
     entry = vault.list_vault(VAULT_PATH, key)
 
+    if entry == {}:
+        print("Le Gestionnaire de Mot de passe est vide.")
+
     for site in entry:
-        print(f"Site: {site}\nLogin: {entry[site]['login']}\nPassword: {entry[site]['password']}")
+        print(f"Site: {site}\nLogin: {entry[site]['login']}\nPassword: {entry[site]['password']}\n")
     
 
 def cmd_delete(site: str) -> None:
     """Commande delete de vault.py"""
     key = verify_vault()
     if key is None:
-        print("Clé incorrect.\n")
+        print("Clé incorrect.")
         return
     
     if vault.delete_vault(VAULT_PATH, site, key):
-        print("Effacement effectué.\n")
+        print("Effacement effectué.")
     else:
-        print("Le site n'est pas présent.\n")
+        print("Le site n'est pas présent.")
     return
     
 
@@ -155,7 +158,7 @@ def main():
     elif args.cmd == "delete":
         cmd_delete(args.site)
     else:
-        print("Commande introuvable.\n")
+        print("Commande introuvable.")
 
     return
 
