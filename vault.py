@@ -9,7 +9,7 @@ def add_vault(filepath: str, site: str, login: str, password: str, key: bytes) -
         data[site] = {"login": login, "password": password}
         storage.save_vault(filepath, key, data)
         return True
-
+    
     return False
 
 
@@ -28,7 +28,7 @@ def list_vault(filepath: str, key: bytes) -> dict:
 
 
 def delete_vault(filepath: str, site: str, key: bytes) -> bool:
-    """Supprime un site voulue dans le filepath. Retourne faux si le site n'est pas dans le filepath"""
+    """Supprime un site voulu dans le filepath. Retourne faux si le site n'est pas dans le filepath"""
     data = storage.load_vault(filepath, key)
     if site in data:
         del data[site]
