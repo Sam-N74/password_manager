@@ -4,7 +4,7 @@ from cryptography.hazmat.primitives import hashes
 from base64 import urlsafe_b64encode
 
 def derive_key(password: str, salt: bytes) -> bytes:
-    """Dérive une clé de Fernet (32 bytes) à partir du master password et d'un salt'"""
+    """Dérive une clé de Fernet (32 bytes) à partir du master password et d'un salt"""
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
