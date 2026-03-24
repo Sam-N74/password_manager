@@ -78,6 +78,35 @@ def cmd_change_password() -> None:
     print("Master Password modifié !")
 
 
+def cmd_reset() -> None:
+    if not os.path.exists(HASH_PATH):
+        print("CLI non initialisé, Reset impossible.")
+        return None
+    
+    key = verify_vault()
+    if key is None:
+        print("Clé incorrect.")
+        return
+    
+    print("Attention, cette action entrainera la suppression du Gestionnaire de Mot de passe")
+    result = None
+    while (result != "o" and result != "n"):
+        result = input("Confirmation ? (o/n): ")
+
+        if (result == "n"):
+            return
+        elif(result == "o"):
+            try:
+                if os.path.exists(VAULT_PATH):
+                    os.remove(VAULT_PATH)
+                os.remove(SALT_PATH)
+                os.remove(HASH_PATH)
+            except FileNotFoundError:
+                print("Reset impossible, le Gestionnaire n'est pas initialisé")
+                return
+            print("Reset Terminé !")
+    
+
 def cmd_add(site: str, login: str, password: str) -> None:
     """Commande add de vault.py"""
     key = verify_vault()
@@ -164,6 +193,9 @@ def main():
     #Commande change_password
     parser_change_password = subparsers.add_parser("change_password", help="Modifier le Master Password")
 
+    #Commande reset
+    parser_reset = subparsers.add_parser("reset", help="Reset le Gestionnaire completement")
+
     #Commande add
     parser_add = subparsers.add_parser("add", help="Ajouter un site")
     parser_add.add_argument("site")
@@ -187,6 +219,8 @@ def main():
         init_vault()
     elif args.cmd == "change_password":
         cmd_change_password()
+    elif args.cmd == "reset":
+        cmd_reset()
     elif args.cmd == "add":
         cmd_add(args.site, args.login, args.password)
     elif args.cmd == "get":
