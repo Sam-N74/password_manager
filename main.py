@@ -45,6 +45,39 @@ def verify_vault() -> bytes | None:
     return None
 
 
+def cmd_change_password() -> None:
+    """Commande pour changer le Master Password"""
+    if not os.path.exists(HASH_PATH):
+        print("CLI non initialisé, changement de Master Password impossible.")
+        return None
+    
+    key = verify_vault()
+    if key is None:
+        print("Clé incorrect.")
+        return
+    
+    password = getpass.getpass("Nouveau Master Password: ")
+    confirmation = getpass.getpass("Confirmation: ")
+
+    while (password != confirmation):
+        print("Les 2 Master Password sont différents")
+        password = getpass.getpass("Master Password: ")
+        confirmation = getpass.getpass("Confirmation: ")
+
+    salt = os.urandom(16)
+    with open(SALT_PATH, 'wb') as f:
+        f.write(salt)
+
+    hashed = auth.hash_master_password(password)
+    with open(HASH_PATH, 'wb') as f:
+        f.write(hashed)
+
+    new_key = crypto.derive_key(password, salt)
+    vault.reencrypt_vault(VAULT_PATH, key, new_key)
+
+    print("Master Password modifié !")
+
+
 def cmd_add(site: str, login: str, password: str) -> None:
     """Commande add de vault.py"""
     key = verify_vault()
@@ -104,7 +137,7 @@ def cmd_list() -> None:
         print("Le Gestionnaire de Mot de passe est vide.")
 
     for site in entry:
-        print(f"Site: {site}\nLogin: {entry[site]['login']}\nPassword: {entry[site]['password']}\n")
+        print(f"\nSite: {site}\nLogin: {entry[site]['login']}\nPassword: {entry[site]['password']}")
     
 
 def cmd_delete(site: str) -> None:
@@ -128,6 +161,9 @@ def main():
     #Commande init
     parser_init = subparsers.add_parser("init", help="Initialise le Gestionnaire de Mot de passe")
 
+    #Commande change_password
+    parser_change_password = subparsers.add_parser("change_password", help="Modifier le Master Password")
+
     #Commande add
     parser_add = subparsers.add_parser("add", help="Ajouter un site")
     parser_add.add_argument("site")
@@ -149,6 +185,8 @@ def main():
 
     if args.cmd == "init":
         init_vault()
+    elif args.cmd == "change_password":
+        cmd_change_password()
     elif args.cmd == "add":
         cmd_add(args.site, args.login, args.password)
     elif args.cmd == "get":

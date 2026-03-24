@@ -9,7 +9,7 @@ def add_vault(filepath: str, site: str, login: str, password: str, key: bytes) -
         data[site] = {"login": login, "password": password}
         storage.save_vault(filepath, key, data)
         return True
-    
+
     return False
 
 
@@ -36,3 +36,8 @@ def delete_vault(filepath: str, site: str, key: bytes) -> bool:
         return True
     
     return False
+
+def reencrypt_vault(filepath: str, old_key: bytes, new_key: bytes) -> None:
+    """Chiffre le vault avec une nouvelle clé (utilisé pour le changement de Master Password)"""
+    data = storage.load_vault(filepath, old_key)
+    storage.save_vault(filepath, new_key, data)
